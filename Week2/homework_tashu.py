@@ -1,13 +1,5 @@
-
-# coding: utf-8
-
-# In[2]:
-
 import csv
 from operator import itemgetter
-
-
-# In[5]:
 
 def get_top10_station(tashu_dict, station_dict):
     """
@@ -30,14 +22,12 @@ def get_top10_station(tashu_dict, station_dict):
     
     station_cnt = [0] * (226 + 1)
     for row in tashu_dict:
-        index = row['RENT_STATION']
-        if index != '':
-            station_cnt[int(index)] += 1
-
-        index = row['RETURN_STATION']
-        if index != '':
-            station_cnt[int(index)] += 1
-            
+        rent_index = row['RENT_STATION']
+        return_index = row['RETURN_STATION']
+        if rent_index == '' or return_index == '':
+            continue
+        station_cnt[int(rent_index)] += 1
+        station_cnt[int(return_index)] += 1
 
     station_map = {}
     for row in station_dict:
@@ -58,8 +48,6 @@ def get_top10_station(tashu_dict, station_dict):
     
     return result
 
-
-# In[7]:
 
 def get_top10_trace(tashu_dict, station_dict):
     """
@@ -87,7 +75,6 @@ def get_top10_trace(tashu_dict, station_dict):
         if rent_st != '' and return_st != '':
             trace_count[int(rent_st)][int(return_st)] += 1
             
-            
     station_map = {}
     
     for row in station_dict:
@@ -96,12 +83,10 @@ def get_top10_trace(tashu_dict, station_dict):
     station_list = []
     for i in range(1,227,1):
         for j in range(1,227,1):
-            #print(i,j,trace_count[i][j])
             if trace_count[i][j] > 0:
                 station_list.append((i,j,trace_count[i][j]))
 
     station_list = sorted(station_list, key=itemgetter(2), reverse=True)
-
 
     result = []
     top = 0
@@ -112,9 +97,3 @@ def get_top10_trace(tashu_dict, station_dict):
         top += 1
     
     return result
-
-
-# In[ ]:
-
-
-
