@@ -72,7 +72,7 @@ daejon_cent <- as.numeric(daejon_gc)
 
 tashu_map <- 
   ggmap(get_googlemap(center = daejon_cent, scale = 1, maptype = "roadmap", zoom = 13)) +
-  geom_point(data = station_df, aes(x = lon, y = lat, size = usage), alpha = .7, colour = '#FF3232') +
+  geom_point(data = station_df, aes(x = lon, y = lat), alpha = .7, size = station_df$usage*0.00003, colour = '#FF3232') +
   theme(legend.position="none") +
   xlab("위도") +
   ylab("경도") + 
