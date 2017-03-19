@@ -4,10 +4,14 @@ rm(list=ls())
 
 # edit(var)
 
+
+
 library(ggplot2)
 library(ggmap)
 library(extrafont)
 library(scales)
+library(data.table)
+library(stringr)
 
 tashu <- read.csv('./Data/tashu.csv')
 station <- read.csv('./Data/station.csv', encoding = "UTF-8")
@@ -17,6 +21,12 @@ tashu$RETURN_DATE <- strptime(tashu$RETURN_DATE, "%Y%m%d%H%M%S")
 
 kiosk_station_map <- station$명칭
 names(kiosk_station_map) <- c(station$키오스크번호)
+
+latlan <- str_split_fixed(station$좌표, ",", 2)
+lat_map <- latlan[,1]
+names(lat_map) <- c(station$키오스크번호)
+lan_map <- latlan[,2]
+names(lan_map) <- c(station$키오스크번호)
 
 rent_station_cnt <- data.frame(tashu$RENT_STATION)
 colnames(rent_station_cnt) <- c("station_cnt")
@@ -35,28 +45,41 @@ top10_df <- data.frame(
 )
 rownames(top10_df) <- 1:nrow(top10_df)
 
-colors = c(
-  "#cdbbe0",
-  "#c7e5bb",
-  "#e6bbcc",
-  "#92c7b4",
-  "#e5b6a5",
-  "#9edce6",
-  "#d5c9a0",
-  "#a9c4e1",
-  "#dbe6d5",
-  "#b1beaf")
+station_df <- data.frame(
+  usage = c(station_cnt$count),
+  lat = as.numeric(lat_map[station_cnt$kiosk]),
+  lon = as.numeric(lan_map[station_cnt$kiosk])
+)
 
-barplot(top10_df$usage, main="Top 10 Station", xlab="Station #", ylab="Usage", ylim=c(0,350000),
-        names.arg=c(top10_df$kiosk), col=colors)
+theme_set(theme_gray(base_family = "NanumGothicOTF"))
 
-theme_set(theme_bw(base_family = "NanumGothicOTF"))
-
-ggplot(top10_df, aes(x = as.factor(kiosk), y = usage, fill=as.factor(kiosk))) + 
+top10_station_bar_graph <- ggplot(top10_df, aes(x = as.factor(kiosk), y = usage, fill=as.factor(kiosk))) + 
   geom_bar(stat='identity') +
   xlab("Station Number") +
   ylab("Usage") +
   ggtitle("Top 10 Station") +
   scale_fill_discrete(name = "Station Name", labels=top10_df$name) +
-  scale_y_continuous(labels=comma)
+  scale_y_continuous(labels=comma) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+top10_station_bar_graph
+
+
+
+daejon_gc <- geocode("Daejon")
+daejon_cent <- as.numeric(daejon_gc)
+
+tashu_map <- ggmap(get_googlemap(center = daejon_cent, scale = 1, maptype = "roadmap", zoom = 13)) +
+  geom_point(data = station_df, aes(x = lon, y = lat, size = usage), alpha = .7, colour = '#FF3232') +
+  theme(legend.position="none") +
+  xlab("위도") +
+  ylab("경도") + 
+  ggtitle("Tashu 정류장 별 사용 빈도(∝점의 크기)") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+tashu_map
+
+
+
+
 
