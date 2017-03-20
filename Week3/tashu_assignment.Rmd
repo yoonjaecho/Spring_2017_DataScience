@@ -1,0 +1,170 @@
+---
+title: "Tashu Data Analysis with R"
+author: "201202154, 조윤재"
+output:
+  html_document: default
+  pdf_document: default
+---
+<br><br>
+저번주에 가공했던 'station.csv'와 'tashu.csv' 파일을 이용하여 과제를 수행했습니다.
+
+```{r, message=FALSE, warning=FALSE}
+setwd('/Users/yoonjae/Desktop/DataScience/Week3')
+# wd = getwd()
+rm(list=ls())
+
+# edit(var)
+
+library(ggplot2)
+library(ggmap)
+library(extrafont)
+library(scales)
+library(data.table)
+library(stringr)
+library(dplyr)
+
+theme_set(theme_gray(base_family = "NanumGothicOTF"))
+
+tashu <- read.csv('./Data/tashu.csv', encoding = "UTF-8")
+station <- read.csv('./Data/station.csv', encoding = "UTF-8")
+```
+
+필요한 Library를 선언하고, 한글 글꼴을 설정 한 뒤, csv 파일을 읽었습니다.
+
+```{r}
+kiosk_station_map <- station$명칭
+names(kiosk_station_map) <- c(station$키오스크번호)
+
+latlan <- str_split_fixed(station$좌표, ",", 2)
+lat_map <- latlan[, 1]
+names(lat_map) <- c(station$키오스크번호)
+lan_map <- latlan[, 2]
+names(lan_map) <- c(station$키오스크번호)
+```
+
+명칭, 정류장 번호, 위도와 경도를 하나의 정류장 정보로 만들기 위한 작업입니다.
+
+특히 좌표 Column 에서 위도와 경도를 분리하기 위해 str_split_fixed 함수를 사용 하였습니다.
+
+```{r}
+rent_station_cnt <- data.frame(tashu$RENT_STATION)
+colnames(rent_station_cnt) <- c("station_cnt")
+return_station_cnt <- data.frame(tashu$RETURN_STATION)
+colnames(return_station_cnt) <- c("station_cnt")
+
+station_cnt <- data.frame(table(rbind(rent_station_cnt, return_station_cnt)))
+colnames(station_cnt) <- c("kiosk","count")
+```
+
+사용 빈도를 Count하기 위해서 RENT_STATION과 RETURN_STATION을 하나의 Column, station_cnt로 rbind하였습니다.
+
+***
+<P style="page-break-before: always">
+
+### 과제 1. Top 10 Station
+
+```{r}
+sorted_station_cnt <- station_cnt[order(-station_cnt$count),]
+top10_station_cnt <- head(sorted_station_cnt, 10)
+
+top10_df <- data.frame(
+  kiosk = c(top10_station_cnt$kiosk),
+  usage = c(top10_station_cnt$count),
+  name = kiosk_station_map[top10_station_cnt$kiosk]
+)
+rownames(top10_df) <- 1:nrow(top10_df)
+
+top10_df
+```
+
+station_cnt에서 count값을 내림차순으로 정렬한뒤 top10_station_cnt에 저장 하였습니다.
+그리고 정류장 번호, 사용 빈도, 명칭을 하나의 Dataframe으로 만들고, 출력 한 모습입니다.
+
+```{r}
+top10_station_bar_graph <- 
+  ggplot(top10_df, aes(x = reorder(as.factor(kiosk), -usage), y = usage,
+                       fill = reorder(as.factor(kiosk), -usage), label = usage),
+                       position = "dodge") + 
+  geom_bar(stat = 'identity') +
+  geom_text(position = position_dodge(0.9), vjust = -1, size = 3) +
+  xlab("Station Number") +
+  ylab("Usage") +
+  ggtitle("Top 10 Station") +
+  scale_fill_discrete(name = "Station Name", labels = top10_df$name) +
+  scale_y_continuous(labels = comma) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+top10_station_bar_graph
+```
+
+Top 10 사용 빈도 정류장을 출력한 모습입니다. Dataframe에 같이 저장 해둔 명칭을 통해 legend에 표시해주었습니다.
+
+***
+<P style="page-break-before: always">
+
+### 과제 2. Tashu 정류장 별 사용 빈도
+
+```{r}
+station_df <- data.frame(
+  usage = c(station_cnt$count),
+  lat = as.numeric(lat_map[station_cnt$kiosk]),
+  lon = as.numeric(lan_map[station_cnt$kiosk])
+)
+
+head(station_df, 5)
+```
+
+사용빈도, 위도, 경도를 하나의 Dataframe으로 묶어주었습니다.
+
+```{r results='hide', message=FALSE, warning=FALSE}
+daejon_gc <- geocode("Daejon")
+daejon_cent <- as.numeric(daejon_gc)
+
+tashu_map <- 
+  ggmap(get_googlemap(center = daejon_cent, scale = 1, maptype = "roadmap", zoom = 13)) +
+  geom_point(data = station_df, aes(x = lon, y = lat), alpha = .7, 
+             size = station_df$usage*0.00003, colour = '#FF3232') +
+  theme(legend.position="none") +
+  xlab("위도") +
+  ylab("경도") + 
+  ggtitle("Tashu 정류장 별 사용 빈도 (∝점의 크기)") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+tashu_map
+```
+
+정류장 별 사용빈도를 Google map에 Scatter plot으로 표시한 모습입니다.
+
+***
+<P style="page-break-before: always">
+
+### 과제 3. Top 20 Trace
+
+```{r}
+top20_trace<- tashu %>% 
+  group_by(as.factor(tashu$RENT_STATION), as.factor(tashu$RETURN_STATION)) %>% 
+  summarize(freq = n())  %>%
+  arrange(desc(freq))
+
+colnames(top20_trace) <- c("From","To","Frequency")
+top20_trace <- head(top20_trace, 20)
+
+head(top20_trace, 5)
+```
+
+dplyr package의 group_by함수를 사용하여 RENT_STATION, RETURN_STATION를 하나의 그룹으로 묶어 count 해주어 Sorting 한뒤, 위와 같은 Dataframe을 만들었습니다.
+
+```{r, message=TRUE, warning=TRUE}
+top20_trace_scatter_graph <-
+  ggplot(top20_trace, aes(x = From, y = To, size = Frequency, label = Frequency)) +
+  geom_point(colour = '#A014A0') +
+  xlab("Rent station(From)") +
+  ylab("Return station(To)") +
+  ggtitle("Top 20 Tashu 사용경로 빈도 (∝점의 크기)") +
+  theme(plot.title = element_text(hjust = 0.5))
+
+top20_trace_scatter_graph
+```
+
+Top 20 사용 경로 빈도를 Scatter plot으로 표현한 모습입니다. 
+
