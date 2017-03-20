@@ -96,7 +96,7 @@ top10_station_bar_graph <-
 
 top10_station_bar_graph
 ```
-
+![Imgur](http://i.imgur.com/9jb33ui.png)
 Top 10 사용 빈도 정류장을 출력한 모습입니다. Dataframe에 같이 저장 해둔 명칭을 통해 legend에 표시해주었습니다.
 
 ***
@@ -132,7 +132,7 @@ tashu_map <-
 
 tashu_map
 ```
-
+![Imgur](http://i.imgur.com/o7VcWFj.jpg)
 정류장 별 사용빈도를 Google map에 Scatter plot으로 표시한 모습입니다.
 
 ***
@@ -165,6 +165,6 @@ top20_trace_scatter_graph <-
 
 top20_trace_scatter_graph
 ```
-
+![Imgur](http://i.imgur.com/N2eE7bR.png)
 Top 20 사용 경로 빈도를 Scatter plot으로 표현한 모습입니다. 
 
