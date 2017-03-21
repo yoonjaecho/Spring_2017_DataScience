@@ -21,7 +21,7 @@ library(extrafont)
 library(scales)
 library(data.table)
 library(stringr)
-library(dplyr)
+library(chorddiag)
 
 theme_set(theme_gray(base_family = "NanumGothicOTF"))
 
@@ -51,7 +51,6 @@ rent_station_cnt <- data.frame(tashu$RENT_STATION)
 colnames(rent_station_cnt) <- c("station_cnt")
 return_station_cnt <- data.frame(tashu$RETURN_STATION)
 colnames(return_station_cnt) <- c("station_cnt")
-
 station_cnt <- data.frame(table(rbind(rent_station_cnt, return_station_cnt)))
 colnames(station_cnt) <- c("kiosk","count")
 ```
@@ -140,11 +139,10 @@ tashu_map
 
 ### 과제 3. Top 20 Trace
 
-```{r}
-top20_trace<- tashu %>% 
-  group_by(as.factor(tashu$RENT_STATION), as.factor(tashu$RETURN_STATION)) %>% 
-  summarize(freq = n())  %>%
-  arrange(desc(freq))
+```{r, message=FALSE, warning=FALSE}
+top20_trace <- na.omit(tashu)
+top20_trace <- data.frame(table(top20_trace$RENT_STATION, top20_trace$RETURN_STATION))
+top20_trace <- top20_trace[order(-top20_trace$Freq),]
 
 colnames(top20_trace) <- c("From","To","Frequency")
 top20_trace <- head(top20_trace, 20)
@@ -152,7 +150,7 @@ top20_trace <- head(top20_trace, 20)
 head(top20_trace, 5)
 ```
 
-dplyr package의 group_by함수를 사용하여 RENT_STATION, RETURN_STATION를 하나의 그룹으로 묶어 count 해주어 Sorting 한뒤, 위와 같은 Dataframe을 만들었습니다.
+RENT_STATION, RETURN_STATION를 하나의 Pair로 묶어, Table()로 Count 한뒤, Freq를 기준으로 내림차순으로 Sorting하여 위와 같은 Dataframe을 만들었습니다.
 
 ```{r, message=TRUE, warning=TRUE}
 top20_trace_scatter_graph <-
@@ -168,3 +166,36 @@ top20_trace_scatter_graph
 ![Imgur](http://i.imgur.com/N2eE7bR.png)
 Top 20 사용 경로 빈도를 Scatter plot으로 표현한 모습입니다. 
 
+***
+<P style="page-break-before: always">
+
+### Top 20 Trace Chord Diagram
+
+```{r}
+top20_trace_matrix <- matrix(0, 108, 108)
+
+for(i in 1:20) {
+  from <- top20_trace[i, 1]
+  to <- top20_trace[i, 2]
+  freq <- top20_trace[i, 3]
+  top20_trace_matrix[from, to] <- freq
+}
+```
+
+추가적으로 Top 20 경로를 Traffic 양을 시각화하는데 유용한 Chord diagram으로 표시하기 위해, top20_trace dataframe으로 부터 2차원 matrix를 생성하여 freq값을 넣어 주었습니다.
+
+```{r, message=FALSE, warning=FALSE}
+palette <- c("#466791","#60bf37","#953ada","#4fbe6c","#ce49d3",
+             "#a7b43d","#5a51dc","#d49f36","#552095","#507f2d",
+             "#db37aa","#84b67c","#a06fda","#df462a","#5b83db",
+             "#c76c2d","#4f49a3","#82702d","#dd6bbb","#334c22")
+haircolors <- head(station$명칭, 108)
+dimnames(top20_trace_matrix) <- list(have = haircolors, prefer = haircolors)
+top20_trace_chord <- chorddiag(top20_trace_matrix, groupColors = palette,
+          groupnamePadding = 40, groupnameFontsize = 10)
+
+top20_trace_chord
+```
+![Imgur](http://i.imgur.com/BYEXcra.png)
+<br>
+Chord Diagram을 그리기 위해서 chorddiag library를 사용하였고, 그에 필요한 데이터 형식을 만들어 주고 그려준 모습입니다.
