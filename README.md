@@ -7,7 +7,7 @@
 1. Introduction to Python for Data Science
 2. Introduction to R
 
-#### [Week2](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week2/ipynb)
+#### [Week2](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week2)
 ##### Tashu Data Visualization in Python
 1. Top 10 station
 2. Top 10 trace
@@ -23,3 +23,7 @@
 2. Station usage scatter plot in ggmap
 3. Top 20 trace scatter plot
 4. Top 20 trace chord diagram
+
+#### [Week4](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week4)
+##### Tashu Data in Python
+1. Two weeks step per day
