@@ -29,6 +29,6 @@
 1. Two weeks step per day
 
 #### [Week5](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week5)
-##### 2016 Sokulee participant's Fitbit Data in Python
+##### 2016 Sokulee participant's Fitbit Data analysis in Python
 1. Top 10 steps during contest
 2. Top 10 number of taking 9 A.M class during contest
