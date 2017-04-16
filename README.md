@@ -32,3 +32,9 @@
 ##### 2016 Sokulee Contest Participant's Fitbit Data Analysis in Python
 1. Top 10 steps during contest
 2. Top 10 number of taking 9 A.M class student during contest
+
+#### [Week6](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week6)
+##### Predicting Rate of movies using MovieLens data in Python
+1. Get nearest user using euclidean distance
+2. Predicting rate of movies
+3. Calculate accuray with RMSE, MAE
