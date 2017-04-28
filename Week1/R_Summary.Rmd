@@ -1,0 +1,165 @@
+---
+title: "R_Summary"
+author: "Yoonjae"
+date: "4/19/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd('/Users/yoonjae/Desktop/DataScience/')
+# wd = getwd()
+rm(list=ls())
+
+# edit(var)
+
+
+# Set library
+library(ggplot2)
+library(ggmap)
+library(extrafont)
+library(scales)
+library(data.table)
+library(stringr)
+library(chorddiag)
+
+# Set font
+theme_set(theme_gray(base_family = "NanumGothicOTF"))
+```
+
+```{r}
+# Init vector
+number_vector <- c(1, 10, 100, 1000)
+names_vector <- c('one', 'ten', 'hundred', 'thousand')
+
+# Check type
+class(number_vector)
+
+# Set names of vector
+names(number_vector) <- names_vector
+number_vector
+
+# Index selection // [inclusive : inclusive]
+number_vector[c(2,3)]
+number_vector[c('ten','hundred')]
+number_vector[2:3]
+
+condition_vector <- number_vector >= 100
+number_vector[condition_vector]
+```
+
+```{r}
+# Init matrix
+matrix(1:9, byrow = TRUE, nrow = 3)
+matrix(1:9, byrow = FALSE, nrow = 3)
+# default byrow value is FALSE
+matrix(1:9, nrow = 3)
+
+new_hope <- c(460.998, 314.4)
+empire_strikes <- c(290.475, 247.900)
+return_jedi <- c(309.306, 165.8)
+
+# Vectorization
+box_office <- c(new_hope, empire_strikes, return_jedi)
+box_office
+
+# Construct matrix
+star_wars_matrix <- matrix(box_office, byrow = TRUE, nrow = 3)
+star_wars_matrix
+
+# Set column, row names
+col_vector <- c('US', 'non-US')
+row_vector <- c('A New Hope', 'The Empire Strike Back', 'Return fo the Jedi')
+colnames(star_wars_matrix) <- col_vector
+rownames(star_wars_matrix) <- row_vector
+star_wars_matrix
+
+same_star_wars_matrix <- matrix(box_office, nrow = 3, byrow = TRUE, dimnames = list(row_vector, col_vector))
+same_star_wars_matrix
+```
+
+```{r}
+# Sum of rows, cols
+sum_rows <- rowSums(star_wars_matrix)
+sum_cols <- colSums(same_star_wars_matrix)
+
+# cbind, rbind : same number of elements, same name
+star_wars_matrix <- cbind(star_wars_matrix, sum_rows)
+star_wars_matrix
+
+same_star_wars_matrix <- rbind(same_star_wars_matrix, sum_cols)
+same_star_wars_matrix
+```
+
+```{r}
+# Init Data frame
+name <- c("Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune")
+type <- c("Terrestrial planet", "Terrestrial planet", "Terrestrial planet", 
+            "Terrestrial planet", "Gas giant", "Gas giant", "Gas giant", "Gas giant")
+diameter <- c(0.382, 0.949, 1, 0.532, 11.209, 9.449, 4.007, 3.883)
+rotation <- c(58.64, -243.02, 1, 1.03, 0.41, 0.43, -0.72, 0.67)
+rings <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE)
+
+planets_df <- data.frame(
+  name, type, diameter, rotation, rings
+)
+planets_df
+
+# Access by columns name
+planets_df$name
+planets_df[1]
+
+# subset
+planet_subset <- subset(planets_df, select=c(name, diameter), subset=(diameter>1))
+planet_subset
+```
+
+```{r}
+# Merge, join
+first_df <- data.frame( 
+  uid <- c(1,2,3,4,5),
+  first_name <- c("aa","bb","cc","dd","ee")
+)
+colnames(first_df) <- c('uid','first_name')
+
+last_df <- data.frame(
+  uid <- c(3,4,5,6,7),
+  last_name <- c("cc","dd","ee","ff","gg")
+)
+colnames(last_df) <- c('uid','last_name')
+
+inner_join <- merge(first_df, last_df, by='uid')
+inner_join
+
+outer_join <- merge(first_df, last_df, by='uid', all=TRUE)
+outer_join
+
+left_outer_join <- merge(first_df, last_df, by='uid', all.x=TRUE)
+left_outer_join
+
+right_outer_join <- merge(first_df, last_df, by='uid', all.y=TRUE)
+right_outer_join
+```
+
+```{r}
+# Sorting
+df <- data.frame(
+  a <- c(10,20,30,40,50,50),
+  b <- c(1,2,3,4,5,4)
+)
+sorted <- df[order(df$a, -df$b),]
+sorted
+```
+
+```{r}
+# Column delete
+df <- df[,-1]
+# Set index column 
+rownames(df) <- df$var1
+
+```
+
+
+
+
