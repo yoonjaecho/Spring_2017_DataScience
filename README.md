@@ -25,7 +25,7 @@
 4. Top 20 trace chord diagram
 
 #### [Week4](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week4)
-##### Tashu Data in Python
+##### Fitbit Data in Python
 1. Two weeks step per day
 
 #### [Week5](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week5)
