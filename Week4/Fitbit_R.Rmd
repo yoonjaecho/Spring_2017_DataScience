@@ -1,0 +1,111 @@
+---
+title: "Fitbit_R"
+author: "Yoonjae"
+date: "4/26/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd('/Users/yoonjae/Desktop/DataScience/Ready/')
+# wd = getwd()
+rm(list=ls())
+
+# edit(var)
+
+
+# Set library
+library(ggplot2)
+library(ggmap)
+library(extrafont)
+library(scales)
+library(data.table)
+library(stringr)
+library(chorddiag)
+library(treemap)
+# Set font
+theme_set(theme_gray(base_family = "NanumGothicOTF"))
+```
+
+# Four week steps heatmap
+```{r}
+step_csv <- read.csv('./python-fitbit-master/four_week_steps.csv', encoding = "UTF-8")
+
+step_heatmap <- ggplot(step_csv, aes(x=as.character(weekday), y=as.character(week))) +
+           geom_tile(aes(fill=step)) +
+           scale_fill_gradient(name='Step count', low='white', high='red') +
+           scale_x_discrete(breaks=c('0','1','2','3','4','5','6'), labels=c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")) +
+           scale_y_discrete(breaks=c('13','14','15','16'), labels=c("March, 5w","April, 1w","April, 2w","April, 3w")) +
+           xlab(NULL) + ylab(NULL) +
+           ggtitle("Step Heatmap") +
+           theme(plot.title = element_text(hjust = 0.5))
+
+step_heatmap
+```
+![Imgur](http://i.imgur.com/dGmfEYw.png)
+
+# Four week sleeps heatmap
+```{r}
+sleep_csv <- read.csv('./python-fitbit-master/four_week_sleeps.csv', encoding = "UTF-8")
+
+sleep_heatmap <- ggplot(sleep_csv, aes(x=as.character(weekday), y=as.character(week))) +
+           geom_tile(aes(fill=sleep_minute)) +
+           scale_fill_gradient(name='Sleep minute', low='white', high='red') +
+           scale_x_discrete(breaks=c('0','1','2','3','4','5','6'), labels=c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")) +
+           scale_y_discrete(breaks=c('13','14','15','16'), labels=c("March, 5w","April, 1w","April, 2w","April, 3w")) +
+           xlab(NULL) + ylab(NULL) +
+           ggtitle("Sleep Heatmap") +
+           theme(plot.title = element_text(hjust = 0.5))
+sleep_heatmap
+```
+![Imgur](http://i.imgur.com/5AXrKmB.png)
+
+# Four week hearts heatmap
+```{r}
+heart_csv <- read.csv('./python-fitbit-master/four_week_hearts.csv', encoding = "UTF-8")
+
+heart_heatmap <- ggplot(heart_csv, aes(x=as.character(weekday), y=as.character(week))) +
+           geom_tile(aes(fill=excercise_minute)) +
+           scale_fill_gradient(name='Excercise minute', low='white', high='red') +
+           scale_x_discrete(breaks=c('0','1','2','3','4','5','6'), labels=c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")) +
+           scale_y_discrete(breaks=c('13','14','15','16'), labels=c("March, 5w","April, 1w","April, 2w","April, 3w")) +
+           xlab(NULL) + ylab(NULL) +
+           ggtitle("Heart Heatmap") +
+           theme(plot.title = element_text(hjust = 0.5))
+heart_heatmap
+```
+![Imgur](http://i.imgur.com/ifQ1oxC.png)
+
+# One week steps per 15min heatmap
+```{r}
+step15_csv <- read.csv('./python-fitbit-master/one_week_15step.csv', encoding = "UTF-8")
+
+step15_heatmap <- ggplot(step15_csv, aes(x=as.numeric(as.character(total_minute)), y=as.character(weekday))) +
+           geom_tile(aes(fill=step_count)) +
+           scale_fill_gradient(name='Step count', low='white', high='red') +
+           #scale_x_discrete(breaks=c('0','360','720','1080','1440'), labels=c("00:00","06:00","12:00","18:00","24:00")) +
+           scale_y_discrete(breaks=c('0','1','2','3','4','5','6'), labels=c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")) +
+           xlab('15 Minute interval') + ylab(NULL) +
+           ggtitle("Step per 15min Heatmap") +
+           theme(plot.title = element_text(hjust = 0.5))
+step15_heatmap
+
+
+```
+![Imgur](http://i.imgur.com/Z1pqgqH.png)
+
+# Four week step and heartrate(Fat burn) treemap
+```{r}
+fitbit_df <- step_csv
+fitbit_df$excercise_minute <- heart_csv$excercise_minute
+fitbit_df
+
+treemap(fitbit_df,
+        index=c("week", "weekday_name"),
+        vSize=c("excercise_minute"),
+        title.legend="Step count",
+        vColor="step",
+        type="value")
+```
+![Imgur](http://i.imgur.com/MVb8jK1.png)
