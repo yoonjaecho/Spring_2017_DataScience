@@ -1,0 +1,136 @@
+---
+title: "Wordcloud_R"
+author: "Yoonjae"
+date: "4/27/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+setwd('/Users/yoonjae/Desktop/DataScience/Ready/')
+# wd = getwd()
+rm(list=ls())
+
+# edit(var)
+
+
+# Set library
+library(ggplot2)
+library(ggmap)
+library(extrafont)
+library(scales)
+library(data.table)
+library(stringr)
+library(chorddiag)
+library(treemap)
+library(XML)
+library(tm)
+library(dplyr)
+library(xtable)
+library(wordcloud)
+library(RColorBrewer)
+library(KoNLP)
+# Set font
+theme_set(theme_gray(base_family = "NanumGothicOTF"))
+```
+
+```{r, message=FALSE, warning=FALSE}
+useSejongDic()
+```
+# Word cloud of bill
+```{r, message=FALSE, warning=FALSE}
+fileName <- "wordcloud_data2.txt"
+conn <- file(fileName, open="r")
+linn <- readLines(conn)
+close(conn)
+
+linn <- gsub('(\n|<b>|</b>|\\d+|\\()', "", linn)
+nouns <- sapply(linn, extractNoun, USE.NAMES=F)
+c <- unlist(nouns)
+nouns <- Filter(function(x) {nchar(x) >= 2}, c)
+
+wordcount <- table(unlist(nouns))
+pal <- brewer.pal(12,"Set3")
+pal <- pal[-c(1:2)]
+wordcloud(names(wordcount), freq=wordcount, scale=c(6,0.3), min.freq=25, random.order=T, rot.per=.1, colors=pal, family="NanumGothicOTF")
+```
+![Imgur](http://i.imgur.com/3jng0CP.png)
+
+# Word cloud of dcinside tree gallery
+```{r, message=FALSE, warning=FALSE}
+fileName <- "wordcloud_data3.txt"
+conn <- file(fileName, open="r")
+linn <- readLines(conn)
+close(conn)
+
+linn <- gsub("(\n|<b>|</b>|\\[|\\]|\\)|\\(|\\~|[:punct:]|[:digit:]|\\d+)", "", linn)
+nouns <- sapply(linn, extractNoun, USE.NAMES=F)
+c <- unlist(nouns)
+nouns <- Filter(function(x) {nchar(x) >= 2}, c)
+
+nouns
+
+wordcount <- table(unlist(nouns))
+pal <- brewer.pal(12,"Set3")
+pal <- pal[-c(1:2)]
+wordcloud(names(wordcount), freq=wordcount, scale=c(6,0.3), min.freq=25, random.order=T, rot.per=.1, colors=pal, family="NanumGothicOTF")
+```
+![Imgur](http://i.imgur.com/SmVswKi.png)
+
+## Merging data for comparison & commonality cloud
+```{r, message=FALSE, warning=FALSE}
+
+# Blog Data
+fileName <- "wordcloud_data_blog.txt"
+conn <- file(fileName, open="r")
+linn_blog <- readLines(conn)
+close(conn)
+
+linn_blog <- gsub("(\n|<b>|</b>|\\[|\\]|\\)|\\(|\\~|[:punct:]|[:digit:]|\\d+)", "", linn_blog)
+nouns <- sapply(linn_blog, extractNoun, USE.NAMES=F)
+c <- unlist(nouns)
+nouns_blog <- Filter(function(x) {nchar(x) >= 2}, c)
+
+wordcount_blog <- table(unlist(nouns_blog))
+
+# News Data
+fileName <- "wordcloud_data_news.txt"
+conn <- file(fileName, open="r")
+linn_news <- readLines(conn)
+close(conn)
+
+linn_news <- gsub("(\n|<b>|</b>|\\[|\\]|\\)|\\(|\\~|[:punct:]|[:digit:]|\\d+)", "", linn_news)
+nouns <- sapply(linn_news, extractNoun, USE.NAMES=F)
+c <- unlist(nouns)
+nouns_news <- Filter(function(x) {nchar(x) >= 2}, c)
+
+wordcount_news <- table(unlist(nouns_news))
+
+wordcount_news_df <- data.frame(wordcount_news)
+colnames(wordcount_news_df) <- c("word", "news_count")
+
+wordcount_blog_df <- data.frame(wordcount_blog)
+colnames(wordcount_blog_df) <- c("word", "blog_count")
+
+# Merging data
+tdm <- merge(wordcount_blog_df, wordcount_news_df, by="word", all=TRUE)
+tdm[is.na(tdm)] <- 0
+rownames(tdm) <- tdm$word
+tdm <- tdm[,-1]
+```
+
+# Comparison word cloud
+```{r, message=FALSE, warning=FALSE}
+par(mfrow=c(1,1))
+comparison.cloud(tdm, random.order=FALSE, colors = c("indianred3","lightsteelblue3"),
+                 title.size=2.5, max.words=400, family="NanumGothicOTF")
+```
+![Imgur](http://i.imgur.com/aAr3eNX.png)
+
+# Commonaliy word cloud
+```{r}
+commonality.cloud(tdm, random.order=FALSE, scale=c(5, .5), colors=brewer.pal(4, "Dark2"), max.words=400, family="NanumGothicOTF")
+```
+![Imgur](http://i.imgur.com/JtldYH4.png)
+
