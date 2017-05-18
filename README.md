@@ -46,3 +46,11 @@
 ##### Visualizing word cloud with Python & R
 1. Crawling data with Python
 2. Visualizing word cloud with R
+
+#### [Week8](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week8)
+##### Hadoop Setting on Virtual machine
+###### Configuration about xml file
+1. core-site.xml
+2. mapred-site.xml
+3. hdfs-site.xml
+4. yarn-site.xml
