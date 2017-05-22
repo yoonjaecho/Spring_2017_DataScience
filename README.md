@@ -54,3 +54,9 @@
 2. mapred-site.xml
 3. hdfs-site.xml
 4. yarn-site.xml
+
+#### [Week9](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week9)
+##### Hadoop wordcount
+1. Default
+2. Filtering patterns
+3. Case sensitive
