@@ -60,3 +60,10 @@
 1. Default
 2. Filtering patterns
 3. Case sensitive
+
+#### [Week10](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Week10)
+##### Hive Setting and Tashu data analysis
+1. Hive setting
+2. Year / Month / Day / Hour usage count
+3. Top 10 rent station
+4. Top 10 trace
