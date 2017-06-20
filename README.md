@@ -67,3 +67,8 @@
 2. Year / Month / Day / Hour usage count
 3. Top 10 rent station
 4. Top 10 trace
+
+#### [Summary](https://github.com/Yoon-jae/Spring_2017_DataScience/tree/master/Summary)
+1. Crawling and Wordcloud
+2. Fitbit data analysis using Spark
+3. Movie lens data analysis using Spark
